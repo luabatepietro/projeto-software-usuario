@@ -49,4 +49,5 @@ jobs:
         script: |
           docker stop usuario
           docker rm --force usuario
-          docker run -d -p 8080:8080 -e REDIS_HOST=redis -e string_conexao_MongoDB_usuario=${{ secrets.string_conexao_MongoDB_usuario }} --name usuario --network=rede luabatepietro/usuario-ci:${{ github.sha }}
+          docker run -d -p 8080:8080 -e REDIS_HOST=redis -e string_conexao_MongoDB_usuario=${{ secrets.string_conexao_MongoDB_usuario }} --name usuario --network=rede rede luabatepietro/usuario-ci:${{ github.sha }}
+          :${{ github.sha }}
