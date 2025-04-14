@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -13,6 +14,16 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    public Usuario validateUser(String user, String password) {
+        Usuario usuario = findUsuarioByEmail(user);
+
+        if (!BCrypt.checkpw(password, usuario.getSenha())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
+        }
+
+        return usuario;
+    }
 
     public List<Usuario> getUsuarios() {
         return usuarioRepository.findAll();
@@ -49,15 +60,4 @@ public class UsuarioService {
         Long count = usuarioRepository.count();
         return new CountUsuarioDTO(count);
     }
-
-    public void validateUser(String user, String password) {
-        Usuario usuario = findUsuarioByEmail(user);
-
-        if (!BCrypt.checkpw(password, usuario.getSenha())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
-        }
-
-    }
-
-
 }

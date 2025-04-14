@@ -1,6 +1,5 @@
 package br.insper.iam.usuario.controller;
 
-import br.insper.iam.usuario.CountUsuarioDTO;
 import br.insper.iam.usuario.Usuario;
 import br.insper.iam.usuario.UsuarioController;
 import br.insper.iam.usuario.UsuarioService;
@@ -49,11 +48,9 @@ public class UsuarioControllerTests {
                 new Usuario("Maria", "maria@example.com", "ADMIN")
         );
 
+        ObjectMapper objectMapper = new ObjectMapper();
 
         Mockito.when(usuarioService.getUsuarios()).thenReturn(usuarios);
-
-
-        ObjectMapper objectMapper = new ObjectMapper();
 
         mockMvc.perform(MockMvcRequestBuilders.get("/api/usuario"))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -62,33 +59,20 @@ public class UsuarioControllerTests {
 
     @Test
     void test_PostUsuario() throws Exception {
-        Usuario usuario = new Usuario();
-        usuario.setNome("Teste");
-        usuario.setEmail("teste@teste.com");
 
-        Mockito.when(usuarioService.saveUsuario(usuario))
-                .thenReturn(usuario);
+        Usuario usuario = new Usuario();
+        usuario.setEmail("a@a.com");
+        usuario.setNome("Teste");
 
         ObjectMapper objectMapper = new ObjectMapper();
 
-        mockMvc.perform(
-                    MockMvcRequestBuilders.post("/api/usuario")
-                            .content(objectMapper.writeValueAsString(usuario))
-                            .contentType(MediaType.APPLICATION_JSON)
+        Mockito.when(usuarioService.saveUsuario(usuario)).thenReturn(usuario);
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/usuario")
+                        .content(objectMapper.writeValueAsString(usuario))
+                        .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(objectMapper.writeValueAsString(usuario)));
-
-    }
-
-
-    @Test
-    void test_CountUsuarios() throws Exception {
-
-        CountUsuarioDTO countUsuarioDTO = new CountUsuarioDTO(5L);
-
-
-        mockMvc.perform(MockMvcRequestBuilders.get("/api/usuario/count"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 }

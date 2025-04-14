@@ -29,18 +29,15 @@ public class UsuarioServiceTests {
     @Test
     void test_findAllUsuariosWhenUsuariosIsEmpty() {
 
-        // preparacao
         Mockito.when(usuarioRepository.findAll()).thenReturn(new ArrayList<>());
 
-        // chamada
         List<Usuario> usuarios = usuarioService.getUsuarios();
 
-        //verificacaoes
         Assertions.assertEquals(0, usuarios.size());
     }
 
     @Test
-    void test_saveUsuarioSuccessfully() {
+    void test_saveUsuarioSuccesfully() {
 
         Usuario usuario = new Usuario();
         usuario.setEmail("a@a.com");
@@ -52,86 +49,78 @@ public class UsuarioServiceTests {
 
         Assertions.assertEquals("a@a.com", usuarioReturn.getEmail());
         Assertions.assertEquals("Teste", usuarioReturn.getNome());
-
     }
 
     @Test
     void test_saveUsuarioErrorEmailIsNull() {
 
         Usuario usuario = new Usuario();
-        usuario.setNome("a@a.com");
+        usuario.setNome("Teste");
 
-        ResponseStatusException exception = Assertions.assertThrows(
-                ResponseStatusException.class,
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
                 () -> usuarioService.saveUsuario(usuario));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-
     }
 
     @Test
-    void test_saveUsuarioErrorNomeIsNull() {
+    void test_saveUsuarioErrorNameIsNull() {
 
         Usuario usuario = new Usuario();
-        usuario.setEmail("Teste");
+        usuario.setEmail("a@a.com");;
 
-        ResponseStatusException exception = Assertions.assertThrows(
-                ResponseStatusException.class,
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
                 () -> usuarioService.saveUsuario(usuario));
         Assertions.assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-
     }
 
     @Test
-    void test_deleteSuccessfully() {
+    void test_findUsuarioByEmailSuccesfully() {
 
         Usuario usuario = new Usuario();
-        usuario.setNome("Teste");
-        usuario.setEmail("aa@aa.com");
+        usuario.setEmail("eduardo@teste.com");
 
-        Mockito.when(usuarioRepository.findByEmail("aa@aa.com")).thenReturn(usuario);
-        Mockito.doNothing().when(usuarioRepository).delete(usuario);
+        Mockito.when(usuarioRepository.findByEmail(usuario.getEmail())).thenReturn(usuario);
 
-        usuarioService.deleteUsuario("aa@aa.com");
+        Usuario usuarioReturn = usuarioService.findUsuarioByEmail(usuario.getEmail());
 
-        Mockito.verify(usuarioRepository, Mockito.times(1))
-                .delete(usuario);
-
+        Assertions.assertEquals("eduardo@teste.com", usuarioReturn.getEmail());
     }
 
     @Test
-    void test_findUsuarioByEmailSuccessfully() {
+    void test_findUsuarioErrorUsuarioNotFound() {
 
         Usuario usuario = new Usuario();
-        usuario.setNome("Teste");
-        usuario.setEmail("aa@aa.com");
+        usuario.setEmail("eduardo@teste.com");
 
-        Mockito.when(usuarioRepository.findByEmail("aa@aa.com")).thenReturn(usuario);
+        Mockito.when(usuarioRepository.findByEmail(usuario.getEmail())).thenReturn(null);
 
-        Usuario usuarioResp = usuarioService.findUsuarioByEmail("aa@aa.com");
-
-        Assertions.assertEquals(usuario.getEmail(), usuarioResp.getEmail());
-        Assertions.assertEquals(usuario.getNome(), usuarioResp.getNome());
-
-    }
-
-    @Test
-    void test_findUsuarioByEmailWhenEmailIsInvalid() {
-
-        Mockito.when(usuarioRepository.findByEmail("aa@aa.com")).thenReturn(null);
-
-        ResponseStatusException exception = Assertions.assertThrows(
-                ResponseStatusException.class,
-                () -> usuarioService.findUsuarioByEmail("aa@aa.com"));
+        ResponseStatusException exception = Assertions.assertThrows(ResponseStatusException.class,
+                () -> usuarioService.findUsuarioByEmail(usuario.getEmail()));
         Assertions.assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
     }
 
     @Test
-    void test_countUsuarioSuccessfully() {
+    void test_deleteUsuarioSuccesfully() {
 
-        Mockito.when(usuarioRepository.count()).thenReturn(10l);
+        Usuario usuario = new Usuario();
+        usuario.setEmail("eduardo@teste.com");
 
-        CountUsuarioDTO countUsuarioDTO = usuarioService.countUsuarios();
-        Assertions.assertEquals(10l, countUsuarioDTO.count());
+        Mockito.when(usuarioRepository.findByEmail(usuario.getEmail())).thenReturn(usuario);
+
+        usuarioService.deleteUsuario(usuario.getEmail());
+
+        Mockito.verify(usuarioRepository, Mockito.times(1)).delete(usuario);
+    }
+
+
+    @Test
+    void test_countUsuariosIsEmpty() {
+
+        Mockito.when(usuarioRepository.count()).thenReturn(0l);
+
+        CountUsuarioDTO countUsuarios = usuarioService.countUsuarios();
+
+        Assertions.assertEquals(0, countUsuarios.count());
     }
 
 
